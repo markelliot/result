@@ -1,5 +1,8 @@
+import java.net.URI
+
 plugins {
     `java-library`
+    `maven-publish`
 }
 
 dependencies {
@@ -14,3 +17,24 @@ tasks.test {
         events("passed", "skipped", "failed")
     }
 }
+
+publishing {
+    publications {
+        create<MavenPublication>("library") {
+            from(components["java"])
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = URI.create("https://maven.pkg.github.com/markelliot/result")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}
+
+tasks["publishLibraryPublicationToGitHubPackagesRepository"].enabled = System.getenv("GITHUB_ACTOR") != null
