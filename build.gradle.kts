@@ -70,7 +70,7 @@ allprojects {
             options.errorprone.disable("UnusedVariable")
         }
 
-        the<JavaPluginExtension>().sourceCompatibility = JavaVersion.VERSION_16
+        the<JavaPluginExtension>().sourceCompatibility = JavaVersion.VERSION_11
     }
 
     spotless {
