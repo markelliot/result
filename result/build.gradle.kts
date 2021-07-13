@@ -18,6 +18,11 @@ tasks.test {
     }
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
         create<MavenPublication>("library") {
