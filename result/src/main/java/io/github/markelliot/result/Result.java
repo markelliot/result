@@ -4,16 +4,37 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
-/** A Rust-inspired result/error container. */
+/**
+ * A Rust-inspired success and error container, useful for propagating errors instead of exceptions.
+ *
+ * <p>One model for this type is as an {@link Optional} that instead of being "present" or "empty"
+ * is "present" or "error", where the error state might provide additional information about why the
+ * state isn't "present".
+ *
+ * <p>Typically {@link Result}s are created as the return values of functions that may not always
+ * succeed. Successful runs of a function return a non-null value using {@link Result#ok(Object)}
+ * and unsuccessful runs of a function return a non-null error value us {@link
+ * Result#error(Object)}.
+ *
+ * <p>It's common to define a descriptive error type as a POJO or record that provides a structured
+ * description of an issue, but equally acceptable to use a {@link String} or even {@code
+ * Collection<String>} to provide messages. In the context of a parsing error, for instance, the
+ * structured error might include details like a line and column number in addition to a description
+ * of the issue.
+ */
 public final class Result<T, E> {
     private final T result;
     private final E error;
 
+    /** Returns a {@link Result} holding a success state. */
     public static <T, E> Result<T, E> ok(T result) {
+        Objects.requireNonNull(result);
         return new Result<>(result, null);
     }
 
+    /** Returns a {@link Result} holding an error state. */
     public static <T, E> Result<T, E> error(E error) {
+        Objects.requireNonNull(error);
         return new Result<>(null, error);
     }
 
@@ -28,62 +49,92 @@ public final class Result<T, E> {
         this.error = error;
     }
 
+    /**
+     * Returns a {@link Result} with the success state transformed according to the supplied
+     * function or the untransformed error state.
+     */
     public <U> Result<U, E> mapResult(Function<T, U> fn) {
         return !isError() ? Result.ok(fn.apply(result)) : Result.error(error);
     }
 
+    /**
+     * When this object holds a success state, returns the {@link Result} produced by transforming
+     * the success state with the supplied function, or the untransformed error state. Note that
+     * callers may use this method to coerece a success state to an error state.
+     */
     public <U> Result<U, E> flatMapResult(Function<T, Result<U, E>> fn) {
         return !isError() ? fn.apply(result) : Result.error(error);
     }
 
+    /**
+     * Returns a {@link Result} with the error state transformed according to the supplied function
+     * or the untransformed success state.
+     */
     public <F> Result<T, F> mapError(Function<E, F> fn) {
         return !isError() ? Result.ok(result) : Result.error(fn.apply(error));
     }
 
+    /**
+     * When this object holds an error state, returns the {@link Result} produced by transforming
+     * the error state with the supplied function, or the untransformed success state. Note that
+     * callers may use this method to coerce an error state to a success state.
+     */
     public <F> Result<T, F> flatMapError(Function<E, Result<T, F>> fn) {
         return !isError() ? Result.ok(result) : fn.apply(error);
     }
 
+    /**
+     * Transforms this result to another using resultFn for success states and errorFn for error
+     * states.
+     */
     public <U, F> Result<U, F> map(Function<T, U> resultFn, Function<E, F> errorFn) {
         return mapResult(resultFn).mapError(errorFn);
     }
 
+    /**
+     * Returns the result of transforming this result to another, taking the output result from the
+     * supplied transformation functions, and using resultFn for success states and errorFn for
+     * error states.
+     */
     public <U, F> Result<U, F> flatMap(
             Function<T, Result<U, F>> resultFn, Function<E, Result<U, F>> errorFn) {
         return !isError() ? resultFn.apply(result) : errorFn.apply(error);
     }
 
+    /** Returns if this object is an error state. */
     public boolean isError() {
         return error != null;
     }
 
     /** Returns an Optional containing the result if it's present or empty otherwise. */
     public Optional<T> result() {
-        return result != null ? Optional.of(result) : Optional.empty();
+        return !isError() ? Optional.of(result) : Optional.empty();
     }
 
     /** Returns an Optional containing the error if it's present or empty otherwise. */
     public Optional<E> error() {
-        return error != null ? Optional.of(error) : Optional.empty();
+        return !isError() ? Optional.empty() : Optional.of(error);
     }
 
-    public <X extends Exception> T orElseThrow(Function<E, X> exceptionSupplier) throws X {
+    /**
+     * Returns the success state of this object or invokes {@code exceptionFn} with the error state
+     * as the argument, and throws the exception that that function returns.
+     */
+    public <X extends Exception> T orElseThrow(Function<E, X> exceptionFn) throws X {
         if (isError()) {
-            throw exceptionSupplier.apply(error);
+            throw exceptionFn.apply(error);
         }
         return result;
     }
 
     /**
-     * Throws an exception with a string rendering of the error type. This is provided as an
-     * ergonomic method to avoid boilerplate, but most callers should prefer {@link
-     * #orElseThrow(Function)}.
+     * Returns the success sate of this object or throws an {@link Exception} with a message that is
+     * the simple {@link String} rendering of the error state. This method is provided as an
+     * ergonomic convenience, most commonly in test code to reduce boilerplate. Almost always,
+     * callers should prefer {@link #orElseThrow(Function)}.
      */
     public T orElseThrow() throws Exception {
-        if (isError()) {
-            throw new Exception(String.valueOf(error));
-        }
-        return result;
+        return orElseThrow(err -> new Exception(String.valueOf(err)));
     }
 
     @Override
