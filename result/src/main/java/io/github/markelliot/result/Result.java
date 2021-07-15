@@ -149,13 +149,13 @@ public final class Result<T, E> {
      *
      * <p>Example usage might follow the pattern:
      *
-     * <pre>
-     *     Result<CustomType, CustomError> maybe = ...;
-     *     if (maybe.isError()) {
-     *         return maybe.coerce();
-     *     }
-     *     CustomType definitely = maybe.unwrap();
-     * </pre>
+     * <pre>{@code
+     * Result<CustomType, CustomError> maybe = ...;
+     * if (maybe.isError()) {
+     *     return maybe.coerce();
+     * }
+     * CustomType definitely = maybe.unwrap();
+     * }</pre>
      */
     public T unwrap() throws IllegalStateException {
         return orElseThrow(err -> new IllegalStateException(String.valueOf(err)));
@@ -169,23 +169,23 @@ public final class Result<T, E> {
      * <p>Callers should use this method when the state is known to be an error but when the result
      * is of the wrong type. This is useful when composing results between functions:
      *
-     * <pre>
-     *     Result<Integer, CustomError> maybeParseOuter() {
-     *         ...
-     *         Result<String, CustomError> maybe = maybeParseInner();
-     *         if (maybe.isError()) {
-     *             return maybe.coerce();
-     *         }
-     *         ...
+     * <pre>{@code
+     * Result<Integer, CustomError> maybeParseOuter() {
+     *     ...
+     *     Result<String, CustomError> maybe = maybeParseInner();
+     *     if (maybe.isError()) {
+     *         return maybe.coerce();
      *     }
-     * </pre>
+     *     ...
+     * }
+     * }</pre>
      *
      * <p>Aside from generating a nicer runtime exception, this is syntactically equivalent (and
      * preferable to):
      *
-     * <pre>
-     *     errorStateResult.mapResult(ignored -> null);
-     * </pre>
+     * <pre>{@code
+     * errorStateResult.mapResult(ignored -> null);
+     * }</pre>
      */
     public <U> Result<U, E> coerce() {
         if (!isError()) {
