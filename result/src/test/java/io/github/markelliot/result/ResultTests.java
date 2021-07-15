@@ -95,4 +95,28 @@ final class ResultTests {
         assertThat(error.flatMap(r -> Result.ok(r.length()), Result::ok))
                 .isEqualTo(Result.ok("error"));
     }
+
+    @Test
+    void testUnwrap() {
+        Result<String, String> ok = Result.ok("ok");
+        Result<String, String> error = Result.error("error");
+
+        assertThat(ok.unwrap()).isEqualTo("ok");
+        assertThatThrownBy(error::unwrap)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("error");
+    }
+
+    @Test
+    void testCoerce() {
+        Result<String, String> ok = Result.ok("ok");
+        Result<String, String> error = Result.error("error");
+
+        assertThatThrownBy(ok::coerce)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Cannot coerce a success-state result");
+
+        Result<Integer, String> coerced = error.coerce();
+        assertThat(coerced).isEqualTo(error);
+    }
 }

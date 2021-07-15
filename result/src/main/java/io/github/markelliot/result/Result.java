@@ -137,6 +137,63 @@ public final class Result<T, E> {
         return orElseThrow(err -> new Exception(String.valueOf(err)));
     }
 
+    /**
+     * Returns the value of result or throwing an {@link IllegalStateException} if no result.
+     *
+     * <p>Syntactically this is the same as {@link #orElseThrow()}, except callers will note that it
+     * throws a {@link RuntimeException} instead of a checked exception, in part because
+     * <em>semantically</em> this method implies the caller knows this is safe to do.
+     *
+     * <p>When the caller does not know the internal state and wishes to throw an ISE, prefer using
+     * {@link #orElseThrow(Function)}.
+     *
+     * <p>Example usage might follow the pattern:
+     *
+     * <pre>
+     *     Result<CustomType, CustomError> maybe = ...;
+     *     if (maybe.isError()) {
+     *         return maybe.coerce();
+     *     }
+     *     CustomType definitely = maybe.unwrap();
+     * </pre>
+     */
+    public T unwrap() throws IllegalStateException {
+        return orElseThrow(err -> new IllegalStateException(String.valueOf(err)));
+    }
+
+    /**
+     * Returns a {@link Result} object containing the same error as the current object and adjusting
+     * the result type to match local call-site requirements. Note that this method will throw an
+     * {@link IllegalStateException} if it is not an error.
+     *
+     * <p>Callers should use this method when the state is known to be an error but when the result
+     * is of the wrong type. This is useful when composing results between functions:
+     *
+     * <pre>
+     *     Result<Integer, CustomError> maybeParseOuter() {
+     *         ...
+     *         Result<String, CustomError> maybe = maybeParseInner();
+     *         if (maybe.isError()) {
+     *             return maybe.coerce();
+     *         }
+     *         ...
+     *     }
+     * </pre>
+     *
+     * <p>Aside from generating a nicer runtime exception, this is syntactically equivalent (and
+     * preferable to):
+     *
+     * <pre>
+     *     errorStateResult.mapResult(ignored -> null);
+     * </pre>
+     */
+    public <U> Result<U, E> coerce() {
+        if (!isError()) {
+            throw new IllegalStateException("Cannot coerce a success-state result");
+        }
+        return Result.error(error);
+    }
+
     @Override
     public boolean equals(Object other) {
         if (this == other) {
