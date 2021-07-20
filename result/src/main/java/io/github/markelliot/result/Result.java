@@ -158,7 +158,10 @@ public final class Result<T, E> {
      * }</pre>
      */
     public T unwrap() throws IllegalStateException {
-        return orElseThrow(err -> new IllegalStateException(String.valueOf(err)));
+        if (isError()) {
+            throw new IllegalStateException(String.valueOf(error));
+        }
+        return result;
     }
 
     /**
