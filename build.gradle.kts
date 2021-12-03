@@ -21,7 +21,7 @@ task("printVersion") {
 }
 
 allprojects {
-    group = "io.github.markelliot.result"
+    group = "com.markelliot.result"
     version = rootProject.version
 }
 

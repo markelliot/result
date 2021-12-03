@@ -1,4 +1,4 @@
-package io.github.markelliot.result;
+package com.markelliot.result;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

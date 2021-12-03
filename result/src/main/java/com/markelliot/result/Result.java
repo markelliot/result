@@ -1,4 +1,4 @@
-package io.github.markelliot.result;
+package com.markelliot.result;
 
 import java.util.Objects;
 import java.util.Optional;
