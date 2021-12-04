@@ -26,6 +26,7 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
+            suppressPomMetadataWarningsFor("javadocElements")
             pom {
                 name.set("result")
                 description.set("A Rust-inspired success and error container.")
