@@ -26,7 +26,7 @@ java {
 
 publishing {
     publications {
-        create<MavenPublication>("library") {
+        create<MavenPublication>("mavenJava") {
             from(components["java"])
             pom {
                 name.set("result")
@@ -50,17 +50,6 @@ publishing {
                     developerConnection.set("scm:git:https://github.com/markelliot/result.git")
                     url.set("https://github.com/markelliot/result")
                 }
-            }
-        }
-    }
-
-    repositories {
-        maven {
-            name = "MavenCentral"
-            url = URI.create("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2")
-            credentials {
-                username = System.getenv("MAVEN_CENTRAL_USER")
-                password = System.getenv("MAVEN_CENTRAL_PASSWORD")
             }
         }
     }
