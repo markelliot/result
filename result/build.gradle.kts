@@ -1,5 +1,3 @@
-import java.net.URI
-
 plugins {
     `java-library`
     `maven-publish`
