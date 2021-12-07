@@ -14,6 +14,9 @@ description of an issue, but equally acceptable to use a `String` or even `Colle
 provide messages. In the context of a parsing error, for instance, the structured error might
 include details like a line and column number in addition to a description of the issue.
 
+Depend on result via Maven Central at coordinates 
+[`com.markelliot.result:result:<version>`](https://search.maven.org/artifact/com.markelliot.result/result).
+
 ## Composition and Usage
 `Result` provides a number of convenience methods to make composing usage both easier and more
 readable.
