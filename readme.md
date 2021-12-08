@@ -1,7 +1,7 @@
 # Result
 A Rust-inspired success and error container, useful for propagating errors instead of exceptions.
 
-One model for this type is as an {@link Optional} that instead of being "present" or "empty"
+One model for this type is as an `Optional` that instead of being "present" or "empty"
 is "present" or "error", where the error state might provide additional information about why the
 state isn't "present".
 
