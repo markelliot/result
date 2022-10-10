@@ -8,7 +8,7 @@ plugins {
     id("com.markelliot.versions") version "0.21.0"
     id("com.palantir.consistent-versions") version "2.11.0"
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
-    id("net.ltgt.errorprone") version "2.0.2" apply false
+    id("net.ltgt.errorprone") version "3.0.0" apply false
     id("org.inferred.processors") version "3.7.0" apply false
 }
 
