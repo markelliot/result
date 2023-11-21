@@ -14,9 +14,10 @@ jobs:
         with:
           app_id: ${{ secrets.MELLBOT_APP_ID }}
           private_key: ${{ secrets.MELLBOT_PK }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           token: ${{ steps.token.outputs.token }}
+          fetch-depth: 0
       - uses: actions/setup-java@v3
         with:
           java-version: '17'
@@ -26,3 +27,4 @@ jobs:
           push-to-repo-token: ${{ steps.token.outputs.token }}
           commit-user: mellbot[bot]
           commit-email: mellbot[bot]@users.noreply.github.com
+          format: true
