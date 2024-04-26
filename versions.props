@@ -1,4 +1,4 @@
-com.google.errorprone:error_prone_core = 2.26.1
+com.google.errorprone:error_prone_core = 2.27.0
 com.jakewharton.nopen:* = 1.0.1
 org.assertj:assertj-core = 3.25.3
 org.junit:junit-bom = 5.11.0-M1
