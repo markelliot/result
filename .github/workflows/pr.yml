@@ -14,4 +14,4 @@ jobs:
           java-version: "17"
           distribution: "zulu"
       - name: Build
-        run: ./gradlew --info --no-daemon build
+        run: ./gradlew --no-daemon build
