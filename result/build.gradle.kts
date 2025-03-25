@@ -5,8 +5,8 @@ plugins {
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom"))
-    testImplementation("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.assertj:assertj-core")
 }
 
