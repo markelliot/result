@@ -1,5 +1,4 @@
 com.google.errorprone:error_prone_core = 2.37.0
 com.jakewharton.nopen:* = 1.0.1
 org.assertj:assertj-core = 3.27.3
-org.junit:junit-bom = 5.12.1
-org.junit.jupiter:junit-jupiter-engine = 5.12.1
+org.junit.jupiter:junit-jupiter = 5.12.1
