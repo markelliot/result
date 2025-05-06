@@ -19,6 +19,7 @@ package com.markelliot.result;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 
@@ -93,6 +94,34 @@ final class ResultTests {
         assertThat(error.map(String::length, Function.identity())).isEqualTo(Result.error("error"));
         assertThat(ok.map(Function.identity(), String::length)).isEqualTo(Result.ok("ok"));
         assertThat(error.map(Function.identity(), String::length)).isEqualTo(Result.error(5));
+    }
+
+    @Test
+    public void testConsume_Ok() {
+        Result<String, String> ok = Result.ok("ok");
+
+        String[] output = new String[1];
+        Consumer<String> setOutput =
+                x -> {
+                    output[0] = x;
+                };
+        ok.consume(setOutput, setOutput);
+
+        assertThat(output[0]).isEqualTo("ok");
+    }
+
+    @Test
+    public void testConsume_Error() {
+        Result<String, String> error = Result.error("error");
+
+        String[] output = new String[1];
+        Consumer<String> setOutput =
+                x -> {
+                    output[0] = x;
+                };
+        error.consume(setOutput, setOutput);
+
+        assertThat(output[0]).isEqualTo("error");
     }
 
     @Test
