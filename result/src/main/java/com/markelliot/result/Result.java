@@ -18,6 +18,7 @@ package com.markelliot.result;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -105,6 +106,18 @@ public final class Result<T, E> {
      */
     public <U, F> Result<U, F> map(Function<T, U> resultFn, Function<E, F> errorFn) {
         return mapResult(resultFn).mapError(errorFn);
+    }
+
+    /**
+     * Consumes this result using resultConsumer for success states and errorConsumer for error
+     * states.
+     */
+    public void consume(Consumer<T> resultConsumer, Consumer<E> errorConsumer) {
+        if (isError()) {
+            errorConsumer.accept(error);
+        } else {
+            resultConsumer.accept(result);
+        }
     }
 
     /**
