@@ -42,9 +42,9 @@ final class ResultTests {
         assertThat(result.error()).contains("error");
         assertThatThrownBy(result::orElseThrow).isInstanceOf(Exception.class).hasMessage("error");
         assertThatThrownBy(
-                () ->
-                        result.orElseThrow(
-                                err -> new IllegalStateException("message: " + err)))
+                        () ->
+                                result.orElseThrow(
+                                        err -> new IllegalStateException("message: " + err)))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("message: error");
     }

@@ -1,12 +1,28 @@
-package com.markelliot.result.testutils;
+/*
+ * (c) Copyright 2025 Mark Elliot. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import com.markelliot.result.Result;
-import org.assertj.core.api.AbstractAssert;
-import org.junit.jupiter.api.Test;
+package com.markelliot.result.testutils;
 
 import static com.markelliot.result.testutils.ResultAssert.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import com.markelliot.result.Result;
+import org.assertj.core.api.AbstractAssert;
+import org.junit.jupiter.api.Test;
 
 final class ResultAssertTests {
 
@@ -104,18 +120,24 @@ final class ResultAssertTests {
     @Test
     void testHasValueSatisfyingWithValidCondition() {
         Result<String, Integer> okResult = Result.ok("test");
-        assertThat(okResult).hasValueSatisfying(value -> {
-            assertEquals("test", value);
-            assertEquals(4, value.length());
-        });
+        assertThat(okResult)
+                .hasValueSatisfying(
+                        value -> {
+                            assertEquals("test", value);
+                            assertEquals(4, value.length());
+                        });
     }
 
     @Test
     void testHasValueSatisfyingWithFailingCondition() {
         Result<String, Integer> okResult = Result.ok("test");
-        assertThatThrownBy(() -> assertThat(okResult).hasValueSatisfying(value -> {
-            assertEquals("wrong", value);
-        }))
+        assertThatThrownBy(
+                        () ->
+                                assertThat(okResult)
+                                        .hasValueSatisfying(
+                                                value -> {
+                                                    assertEquals("wrong", value);
+                                                }))
                 .isInstanceOf(AssertionError.class);
     }
 
@@ -130,18 +152,24 @@ final class ResultAssertTests {
     @Test
     void testHasErrorSatisfyingWithValidCondition() {
         Result<String, Integer> errorResult = Result.error(404);
-        assertThat(errorResult).hasErrorSatisfying(error -> {
-            assertEquals(404, error);
-            assertEquals(Integer.class, error.getClass());
-        });
+        assertThat(errorResult)
+                .hasErrorSatisfying(
+                        error -> {
+                            assertEquals(404, error);
+                            assertEquals(Integer.class, error.getClass());
+                        });
     }
 
     @Test
     void testHasErrorSatisfyingWithFailingCondition() {
         Result<String, Integer> errorResult = Result.error(404);
-        assertThatThrownBy(() -> assertThat(errorResult).hasErrorSatisfying(error -> {
-            assertEquals(500, error);
-        }))
+        assertThatThrownBy(
+                        () ->
+                                assertThat(errorResult)
+                                        .hasErrorSatisfying(
+                                                error -> {
+                                                    assertEquals(500, error);
+                                                }))
                 .isInstanceOf(AssertionError.class);
     }
 
