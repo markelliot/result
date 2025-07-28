@@ -109,6 +109,19 @@ public final class Result<T, E> {
     }
 
     /**
+     * Maps a {@code Result<T, E>} to U by applying fallback errorFn to a contained Error value, or
+     * resultFn to a contained OK value.
+     *
+     * <p>This function can be used to unpack a successful result while handling an error.
+     */
+    public <U, F> U map_or_else(Function<T, U> resultFn, Function<E, U> errorFn) {
+        if (isOk()) {
+            return resultFn.apply(result);
+        }
+        return errorFn.apply(error);
+    }
+
+    /**
      * Consumes this result using resultConsumer for success states and errorConsumer for error
      * states.
      */
@@ -133,6 +146,11 @@ public final class Result<T, E> {
     /** Returns if this object is an error state. */
     public boolean isError() {
         return error != null;
+    }
+
+    /** Returns if this object is in an OK state. */
+    public boolean isOk() {
+        return result != null;
     }
 
     /** Returns an Optional containing the result if it's present or empty otherwise. */
