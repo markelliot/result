@@ -1,9 +1,9 @@
 # Run ./gradlew writeVersionsLocks to regenerate this file
 com.jakewharton.nopen:nopen-annotations:1.0.1 (1 constraints: 0405f135)
-
-[Test dependencies]
 net.bytebuddy:byte-buddy:1.15.11 (1 constraints: 7f0bc9ea)
 org.assertj:assertj-core:3.27.3 (1 constraints: 4105513b)
+
+[Test dependencies]
 org.junit:junit-bom:5.13.4 (7 constraints: e2752517)
 org.junit.jupiter:junit-jupiter:5.13.4 (2 constraints: 820e2572)
 org.junit.jupiter:junit-jupiter-api:5.13.4 (4 constraints: 4339e7e7)
