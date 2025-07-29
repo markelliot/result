@@ -1,5 +1,5 @@
 /*
- * (c) Copyright 2021 Mark Elliot. All rights reserved.
+ * (c) Copyright 2025 Mark Elliot. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,172 +14,84 @@
  * limitations under the License.
  */
 
-package com.markelliot.result;
+package com.markelliot.result.testutils;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
+import com.markelliot.result.Result;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import org.junit.jupiter.api.Test;
+import org.assertj.core.api.AbstractAssert;
 
-final class ResultTests {
-    @Test
-    public void testOk() throws Exception {
-        Result<String, String> result = Result.ok("ok");
-        assertThat(result.isError()).isFalse();
-        assertThat(result.result()).contains("ok");
-        assertThat(result.error()).isEmpty();
-        assertThat(result.orElseThrow()).isEqualTo("ok");
-        assertThat(result.orElseThrow(IllegalStateException::new)).isEqualTo("ok");
+/** Custom AssertJ assertions for Result<T, E> class */
+public final class ResultAssert<T, E> extends AbstractAssert<ResultAssert<T, E>, Result<T, E>> {
+
+    public ResultAssert(Result<T, E> actual) {
+        super(actual, ResultAssert.class);
     }
 
-    @Test
-    public void testError() {
-        Result<String, String> result = Result.error("error");
-        assertThat(result.isError()).isTrue();
-        assertThat(result.result()).isEmpty();
-        assertThat(result.error()).contains("error");
-        assertThatThrownBy(result::orElseThrow).isInstanceOf(Exception.class).hasMessage("error");
-        assertThatThrownBy(
-                        () ->
-                                result.orElseThrow(
-                                        err -> new IllegalStateException("message: " + err)))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("message: error");
+    // Static factory method - this is the key to enabling assertThat(result) syntax
+    public static <T, E> ResultAssert<T, E> assertThat(Result<T, E> actual) {
+        return new ResultAssert<>(actual);
     }
 
-    @Test
-    public void testMapResult() {
-        Result<String, String> ok = Result.ok("ok");
-        Result<String, String> error = Result.error("error");
-        assertThat(ok.mapResult(String::length)).isEqualTo(Result.ok(2));
-        assertThat(error.mapResult(String::length)).isEqualTo(Result.error("error"));
+    // Assert that the result is successful/ok
+    public ResultAssert<T, E> isOk() {
+        isNotNull();
+        actual.error()
+                .ifPresent(
+                        error ->
+                                failWithMessage(
+                                        "Expected result to be Ok but was Error: <%s>",
+                                        actual.error().get()));
+        return this;
     }
 
-    @Test
-    public void testFlatMapResult() {
-        Result<String, String> ok = Result.ok("ok");
-        Result<String, String> error = Result.error("error");
-        assertThat(ok.flatMapResult(r -> Result.ok(2))).isEqualTo(Result.ok(2));
-        assertThat(ok.flatMapResult(r -> Result.error("err"))).isEqualTo(Result.error("err"));
-        assertThat(error.flatMapResult(r -> Result.ok(2))).isEqualTo(Result.error("error"));
-        assertThat(error.flatMapResult(r -> Result.error("error")))
-                .isEqualTo(Result.error("error"));
+    // Assert that the result is an error
+    public ResultAssert<T, E> isError() {
+        isNotNull();
+        if (actual.isOk()) {
+            failWithMessage("Expected result to be Error but was Ok: <%s>", actual.result().get());
+        }
+        return this;
     }
 
-    @Test
-    public void testMapError() {
-        Result<String, String> ok = Result.ok("ok");
-        Result<String, String> error = Result.error("error");
-        assertThat(ok.mapError(String::length)).isEqualTo(Result.ok("ok"));
-        assertThat(error.mapError(String::length)).isEqualTo(Result.error(5));
+    // Assert that the ok value matches expected
+    public ResultAssert<T, E> hasValue(T expectedValue) {
+        isOk();
+
+        T result = actual.result().get();
+
+        if (!result.equals(expectedValue)) {
+            failWithMessage("Expected result value to be <%s> but was <%s>", expectedValue, result);
+        }
+        return this;
     }
 
-    @Test
-    public void testFlatMapError() {
-        Result<String, String> ok = Result.ok("ok");
-        Result<String, String> error = Result.error("error");
-        assertThat(ok.flatMapError(e -> Result.ok("o"))).isEqualTo(Result.ok("ok"));
-        assertThat(ok.flatMapError(e -> Result.error(5))).isEqualTo(Result.ok("ok"));
-        assertThat(error.flatMapError(r -> Result.ok("o"))).isEqualTo(Result.ok("o"));
-        assertThat(error.flatMapError(r -> Result.error(5))).isEqualTo(Result.error(5));
+    // Assert that the error matches expected
+    public ResultAssert<T, E> hasError(E expectedError) {
+        isError();
+
+        E error = actual.error().get();
+
+        if (!error.equals(expectedError)) {
+            failWithMessage("Expected result error to be <%s> but was <%s>", expectedError, error);
+        }
+        return this;
     }
 
-    @Test
-    public void testMap() {
-        Result<String, String> ok = Result.ok("ok");
-        Result<String, String> error = Result.error("error");
-        assertThat(ok.map(String::length, Function.identity())).isEqualTo(Result.ok(2));
-        assertThat(error.map(String::length, Function.identity())).isEqualTo(Result.error("error"));
-        assertThat(ok.map(Function.identity(), String::length)).isEqualTo(Result.ok("ok"));
-        assertThat(error.map(Function.identity(), String::length)).isEqualTo(Result.error(5));
+    // Assert that the ok value satisfies a condition
+    public ResultAssert<T, E> hasValueSatisfying(Consumer<T> valueConsumer) {
+        isOk();
+        T result = actual.result().get();
+        valueConsumer.accept(result);
+        return this;
     }
 
-    @Test
-    public void testConsume_Ok() {
-        Result<String, String> ok = Result.ok("ok");
+    // Assert that the error satisfies a condition
+    public ResultAssert<T, E> hasErrorSatisfying(Consumer<E> errorConsumer) {
+        isError();
 
-        String[] output = new String[1];
-        Consumer<String> setOutput =
-                x -> {
-                    output[0] = x;
-                };
-        ok.consume(setOutput, setOutput);
+        E error = actual.error().get();
 
-        assertThat(output[0]).isEqualTo("ok");
-    }
-
-    @Test
-    public void testConsume_Error() {
-        Result<String, String> error = Result.error("error");
-
-        String[] output = new String[1];
-        Consumer<String> setOutput =
-                x -> {
-                    output[0] = x;
-                };
-        error.consume(setOutput, setOutput);
-
-        assertThat(output[0]).isEqualTo("error");
-    }
-
-    @Test
-    public void testFlatMap() {
-        Result<String, String> ok = Result.ok("ok");
-        Result<String, String> error = Result.error("error");
-        assertThat(ok.flatMap(r -> Result.ok(r.length()), Result::error)).isEqualTo(Result.ok(2));
-        assertThat(error.flatMap(Result::ok, e -> Result.error(e.length())))
-                .isEqualTo(Result.error(5));
-        assertThat(ok.flatMap(Result::ok, e -> Result.error(e.length())))
-                .isEqualTo(Result.ok("ok"));
-        assertThat(error.flatMap(r -> Result.ok(r.length()), Result::error))
-                .isEqualTo(Result.error("error"));
-        assertThat(ok.flatMap(Result::error, e -> Result.error(e.length())))
-                .isEqualTo(Result.error("ok"));
-        assertThat(error.flatMap(r -> Result.ok(r.length()), Result::ok))
-                .isEqualTo(Result.ok("error"));
-    }
-
-    @Test
-    void testUnwrap() {
-        Result<String, String> ok = Result.ok("ok");
-        Result<String, String> error = Result.error("error");
-
-        assertThat(ok.unwrap()).isEqualTo("ok");
-        assertThatThrownBy(error::unwrap)
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("error");
-    }
-
-    @Test
-    void testCoerce() {
-        Result<String, String> ok = Result.ok("ok");
-        Result<String, String> error = Result.error("error");
-
-        assertThatThrownBy(ok::coerce)
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Cannot coerce a success-state result");
-
-        Result<Integer, String> coerced = error.coerce();
-        assertThat(coerced).isEqualTo(error);
-    }
-
-    @Test
-    void testMapOrElse() {
-        Result<String, String> ok = Result.ok("hello");
-        Result<String, String> error = Result.error("error");
-
-        assertThat(ok.map_or_else(String::length, err -> -1)).isEqualTo(5);
-        assertThat(error.map_or_else(String::length, err -> -1)).isEqualTo(-1);
-    }
-
-    @Test
-    void testIsOk() {
-        Result<String, String> ok = Result.ok("value");
-        Result<String, String> error = Result.error("error");
-
-        assertThat(ok.isOk()).isTrue();
-        assertThat(error.isOk()).isFalse();
+        errorConsumer.accept(error);
+        return this;
     }
 }
