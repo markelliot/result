@@ -114,7 +114,7 @@ public final class Result<T, E> {
      *
      * <p>This function can be used to unpack a successful result while handling an error.
      */
-    public <U, F> U map_or_else(Function<T, U> resultFn, Function<E, U> errorFn) {
+    public <U> U map_or_else(Function<T, U> resultFn, Function<E, U> errorFn) {
         if (isOk()) {
             return resultFn.apply(result);
         }
