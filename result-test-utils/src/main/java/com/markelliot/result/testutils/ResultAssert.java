@@ -20,7 +20,7 @@ import com.markelliot.result.Result;
 import java.util.function.Consumer;
 import org.assertj.core.api.AbstractAssert;
 
-/** Custom AssertJ assertions for Result<T, E> class */
+/** Custom AssertJ assertions for {@code Result<T, E>} class */
 public final class ResultAssert<T, E> extends AbstractAssert<ResultAssert<T, E>, Result<T, E>> {
 
     public ResultAssert(Result<T, E> actual) {
