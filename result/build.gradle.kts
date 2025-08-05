@@ -67,4 +67,3 @@ configure<SigningExtension> {
     useInMemoryPgpKeys(key, password)
     sign(publishing.publications)
 }
-
