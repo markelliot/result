@@ -8,14 +8,13 @@ plugins {
     id("com.markelliot.versions") version "0.133.0"
     id("com.palantir.consistent-versions") version "2.36.0"
     id("net.ltgt.errorprone") version "4.3.0" apply false
-    id("org.inferred.processors") version "3.7.0" apply false
     id("org.jreleaser") version "1.19.0"
 }
 
 version = "git describe --tags".runCommand().trim() +
     (if (!"git status -s".runCommand().isEmpty()) ".dirty" else "")
 
-task("printVersion") {
+tasks.register("printVersion") {
     doLast {
         println(rootProject.version)
     }
@@ -29,7 +28,6 @@ allprojects {
 allprojects {
     apply(plugin = "idea")
     apply(plugin = "com.diffplug.spotless")
-    apply(plugin = "com.markelliot.versions")
 
     // lives in allprojects because of consistent-versions
     repositories {
@@ -55,7 +53,6 @@ allprojects {
 
     plugins.withType<JavaLibraryPlugin> {
         apply(plugin = "net.ltgt.errorprone")
-        apply(plugin = "org.inferred.processors")
 
         dependencies {
             "errorprone"("com.google.errorprone:error_prone_core")
