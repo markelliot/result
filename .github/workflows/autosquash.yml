@@ -14,13 +14,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Generate token
+        if: github.event.pull_request.head.repo.full_name == github.repository
         id: token
         uses: tibdex/github-app-token@v1
         with:
           app_id: ${{ secrets.MELLBOT_APP_ID }}
           private_key: ${{ secrets.MELLBOT_PK }}
       - uses: actions/checkout@v3
+        if: github.event.pull_request.head.repo.full_name == github.repository
       - uses: theoremlp/autosquash@v1
+        if: github.event.pull_request.head.repo.full_name == github.repository
         with:
           github-token: ${{ steps.token.outputs.token }}
           pull-request-number: ${{ github.event.pull_request.number }}
