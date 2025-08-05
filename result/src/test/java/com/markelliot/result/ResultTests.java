@@ -164,4 +164,22 @@ final class ResultTests {
         Result<Integer, String> coerced = error.coerce();
         assertThat(coerced).isEqualTo(error);
     }
+
+    @Test
+    void testMapOrElse() {
+        Result<String, String> ok = Result.ok("hello");
+        Result<String, String> error = Result.error("error");
+
+        assertThat(ok.map_or_else(String::length, err -> -1)).isEqualTo(5);
+        assertThat(error.map_or_else(String::length, err -> -1)).isEqualTo(-1);
+    }
+
+    @Test
+    void testIsOk() {
+        Result<String, String> ok = Result.ok("value");
+        Result<String, String> error = Result.error("error");
+
+        assertThat(ok.isOk()).isTrue();
+        assertThat(error.isOk()).isFalse();
+    }
 }
