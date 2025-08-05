@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: required-reviewers
+        if: github.event.pull_request.head.repo.full_name == github.repository
         uses: theoremlp/required-reviews@v2
         with:
           github-token: ${{ secrets.REVIEW_TOKEN }}
