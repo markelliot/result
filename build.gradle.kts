@@ -9,7 +9,7 @@ plugins {
     id("com.palantir.consistent-versions") version "2.36.0"
     id("net.ltgt.errorprone") version "4.3.0" apply false
     id("org.inferred.processors") version "3.7.0" apply false
-    id("org.jreleaser") version "1.19.0" apply false
+    id("org.jreleaser") version "1.19.0"
 }
 
 version = "git describe --tags".runCommand().trim() +
@@ -98,4 +98,27 @@ fun String.runCommand(): String {
             .start()
     proc.waitFor(10, TimeUnit.SECONDS)
     return proc.inputStream.bufferedReader().readText()
+}
+
+jreleaser {
+    signing {
+        active.set(org.jreleaser.model.Active.ALWAYS)
+        armored.set(true)
+        publicKey.set(System.getenv("SIGNING_PUBLIC_KEY"))
+        secretKey.set(System.getenv("SIGNING_SECRET_KEY"))
+        passphrase.set(System.getenv("SIGNING_PASSWORD"))
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                create("sonatype") {
+                    active.set(org.jreleaser.model.Active.ALWAYS)
+                    url.set("https://central.sonatype.com/api/v1/publisher")
+                    username.set(System.getenv("SONATYPE_USERNAME"))
+                    password.set(System.getenv("SONATYPE_PASSWORD"))
+                    stagingRepository("build/staging-deploy")
+                }
+            }
+        }
+    }
 }
