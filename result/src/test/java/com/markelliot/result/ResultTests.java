@@ -170,8 +170,8 @@ final class ResultTests {
         Result<String, String> ok = Result.ok("hello");
         Result<String, String> error = Result.error("error");
 
-        assertThat(ok.map_or_else(String::length, err -> -1)).isEqualTo(5);
-        assertThat(error.map_or_else(String::length, err -> -1)).isEqualTo(-1);
+        assertThat(ok.mapOrElse(String::length, err -> -1)).isEqualTo(5);
+        assertThat(error.mapOrElse(String::length, err -> -1)).isEqualTo(-1);
     }
 
     @Test
