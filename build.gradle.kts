@@ -16,7 +16,7 @@ plugins {
     id("com.google.cloud.tools.jib") version "3.5.4" apply false
     id("com.palantir.consistent-versions") version "3.19.0"
     id("net.ltgt.errorprone") version "5.1.1" apply false
-    id("org.jreleaser") version "1.25.0"
+    id("org.jreleaser") version "1.26.0"
 }
 
 version = "git describe --tags".runCommand().trim() +
